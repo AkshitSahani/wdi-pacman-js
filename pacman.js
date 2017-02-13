@@ -70,10 +70,10 @@ function displayMenu() {
 
 function edibility(ghost) {
   if (ghost.edible === true){
-    console.log('(edible)');
+    return ' (edible)';
   }
   else {
-    console.log('(inedible)');
+    return ' (inedible)';
   }
 }
 
