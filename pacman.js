@@ -1,7 +1,7 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var powerPellets = 4;
 
 // Define your ghosts here
 var inky = {
@@ -36,7 +36,7 @@ var clyde = {
   edible: false
 };
 // replace this comment with your four ghosts setup as objects
-
+var ghosts = [inky, blinky, pinky, clyde]
 
 // Draw the screen functionality
 function drawScreen() {
@@ -53,13 +53,28 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Score: ' + score + '     Lives: ' + lives + '\n\nPower-Pellets: ' + powerPellets);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
+  if (powerPellets > 0){
+  console.log('(p) Eat Power Pellet');}
+  console.log('(1) Eat ' + ghosts[0].name + edibility(ghosts[0]));
+  console.log('(2) Eat ' + ghosts[1].name+ edibility(ghosts[1]));
+  console.log('(3) Eat ' + ghosts[2].name+ edibility(ghosts[2]));
+  console.log('(4) Eat ' + ghosts[3].name+ edibility(ghosts[3]));
   console.log('(q) Quit');
+}
+
+function edibility(ghost) {
+  if (ghost.edible === true){
+    console.log('(edible)');
+  }
+  else {
+    console.log('(inedible)');
+  }
 }
 
 function displayPrompt() {
@@ -74,6 +89,16 @@ function eatDot() {
   score += 10;
 }
 
+function eatPowerPellet(){
+  console.log('\nPower!');
+  score += 50;
+  inky.edible = true;
+  blinky.edible = true;
+  pinky.edible = true;
+  clyde.edible = true;
+  powerPellets -= 1;
+}
+
 
 // Process Player's Input
 function processInput(key) {
@@ -85,11 +110,50 @@ function processInput(key) {
     case 'd':
       eatDot();
       break;
+    case 'p':
+      if (powerPellets > 0){
+        eatPowerPellet();}
+      else
+        {console.log('\nNo Power-Pellets left!');}
+      break;
+    case '1':
+      eatGhost(inky);
+      gameOver();
+      break;
+    case '2':
+      eatGhost(blinky);
+      gameOver();
+      break;
+    case '3':
+      eatGhost(pinky);
+      gameOver();
+      break;
+    case '4':
+      eatGhost(clyde);
+      gameOver();
+      break;
     default:
       console.log('\nInvalid Command!');
   }
 }
 
+function eatGhost(ghost){
+  if (ghost.edible === false){
+    lives -= 1
+    console.log('\n Pac-Man was killed by the ' + ghost.colour + ' coloured ghost named ' + ghost.name);
+  }
+  else if (ghost.edible === true){
+    console.log('\nPac-man just ate the ' + ghost.colour + ' coloured ghost called' + ghost.name + ' who has the personality of a ' + ghost.character);
+    score += 200;
+    ghost.edible = false;
+  }
+}
+
+function gameOver(){
+  if (lives === 0){
+    process.exit();
+  }
+}
 
 //
 // YOU PROBABLY DON'T WANT TO CHANGE CODE BELOW THIS LINE
