@@ -2,6 +2,12 @@
 var score = 0;
 var lives = 2;
 var powerPellets = 4;
+var dots = 240;
+var remainingDots = 240;
+var ghostsEaten = 0;
+var level = 1;
+var fruits = ['Cherry', 'Strawberry', 'Orange', 'Orange', 'Apple', 'Apple', 'Pineapple', 'Pineapple', 'Galaxian Spaceship', 'Galaxian Spaceship', 'Bell', 'Bell', 'Key']
+var fruitPoints = [100, 300, 500, 500, 700, 700, 1000, 1000, 2000, 2000, 3000, 3000, 5000]
 
 // Define your ghosts here
 var inky = {
@@ -53,7 +59,7 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives + '\n\nPower-Pellets: ' + powerPellets);
+  console.log('Level: '+ level + '(' + (fruits[(level - 1)]) + ')' + '\n\nScore: ' + score + '     Lives: ' + lives + '\n\nPower-Pellets: ' + powerPellets + '   Remaining dots: ' + remainingDots);
 }
 
 function displayMenu() {
@@ -61,11 +67,23 @@ function displayMenu() {
   console.log('(d) Eat Dot');
   if (powerPellets > 0){
   console.log('(p) Eat Power Pellet');}
+  if (remainingDots > 0){
+    if (remainingDots > 99){
+      console.log('(h) Eat 100 dots at once');
+    }
+    if (remainingDots > 9){
+      console.log('(t) Eat 10 dots at once');
+    }
+    console.log('(a) Eat all remaining dots');
+  }
   console.log('(1) Eat ' + ghosts[0].name + edibility(ghosts[0]));
   console.log('(2) Eat ' + ghosts[1].name+ edibility(ghosts[1]));
   console.log('(3) Eat ' + ghosts[2].name+ edibility(ghosts[2]));
   console.log('(4) Eat ' + ghosts[3].name+ edibility(ghosts[3]));
   console.log('(q) Quit');
+    if (Math.random() > 0.85){
+      console.log('(f) Eat a ' + fruits[(level - 1)] + ' for ' + fruitPoints[(level-1)] + ' points!');
+  }
 }
 
 function edibility(ghost) {
@@ -86,8 +104,33 @@ function displayPrompt() {
 // Menu Options
 function eatDot() {
   console.log('\nChomp!');
+  if (remainingDots > 0){
   score += 10;
+  remainingDots -= 1;}
 }
+
+function eatTenDots() {
+  console.log('\nChomp!!!');
+  if (remainingDots > 9){
+    score += 100;
+    remainingDots -= 10;
+  }
+}
+
+function eatHundDots() {
+  console.log('\nChomp!!!!!!');
+  if (remainingDots > 99){
+    score += 1000;
+    remainingDots -= 100;
+  }
+}
+
+function eatRemainingDots(){
+  console.log('\nChomp it all!!!!!!');
+  score += (remainingDots * 10);
+  remainingDots = 0;
+}
+
 
 function eatPowerPellet(){
   console.log('\nPower!');
@@ -109,13 +152,42 @@ function processInput(key) {
       break;
     case 'd':
       eatDot();
+      levelUp();
       break;
     case 'p':
       if (powerPellets > 0){
-        eatPowerPellet();}
+        eatPowerPellet();
+        levelUp();
+      }
       else
         {console.log('\nNo Power-Pellets left!');}
       break;
+    case 't':
+      if (remainingDots > 9) {
+        eatTenDots();
+        levelUp();
+        break;
+      }
+      else {
+        console.log('\nYou cant eat more dots than are left');
+        break;
+      }
+    case 'h':
+      if (remainingDots > 99){
+        eatHundDots();
+        levelUp();
+        break;
+      }
+      else {
+        console.log('\nYou cant eat more dots than are left');
+        break;
+      }
+    case 'a':
+      eatRemainingDots()
+      console.log("Greedy! Aren't you");
+      levelUp();
+      break;
+
     case '1':
       eatGhost(inky);
       gameOver();
@@ -132,6 +204,9 @@ function processInput(key) {
       eatGhost(clyde);
       gameOver();
       break;
+    case 'f':
+        score += fruitPoints[(level - 1)];
+        break;
     default:
       console.log('\nInvalid Command!');
   }
@@ -143,15 +218,53 @@ function eatGhost(ghost){
     console.log('\n Pac-Man was killed by the ' + ghost.colour + ' coloured ghost named ' + ghost.name);
   }
   else if (ghost.edible === true){
-    console.log('\nPac-man just ate the ' + ghost.colour + ' coloured ghost called' + ghost.name + ' who has the personality of a ' + ghost.character);
-    score += 200;
-    ghost.edible = false;
-  }
+    switch(ghostsEaten) {
+      case 0:
+        console.log('\nPac-man just ate the ' + ghost.colour + ' coloured ghost called' + ghost.name + ' who has the personality of a ' + ghost.character);
+        score += 200;
+        ghost.edible = false;
+        ghostsEaten += 1;
+        break;
+
+      case 1:
+        console.log('\nPac-man just ate the ' + ghost.colour + ' coloured ghost called' + ghost.name + ' who has the personality of a ' + ghost.character);
+        score += 400;
+        ghost.edible = false;
+        ghostsEaten += 1;
+        break;
+
+      case 2:
+        console.log('\nPac-man just ate the ' + ghost.colour + ' coloured ghost called' + ghost.name + ' who has the personality of a ' + ghost.character);
+        score += 800;
+        ghost.edible = false;
+        ghostsEaten += 1;
+        break;
+
+      case 3:
+        console.log('\nPac-man just ate the ' + ghost.colour + ' coloured ghost called' + ghost.name + ' who has the personality of a ' + ghost.character);
+        score += 1600;
+        ghost.edible = false;
+        ghostsEaten = 0;
+        break;
+      }
+    }
 }
 
 function gameOver(){
   if (lives === 0){
     process.exit();
+  }
+}
+
+function levelUp(){
+  if (powerPellets === 0 && remainingDots === 0){
+    level += 1;
+    powerPellets = 4;
+    remainingDots = 240;
+    for (var i = 0; i < 4; i++){
+      (ghosts[i]).edible = false;
+    }
+    drawScreen();
   }
 }
 
